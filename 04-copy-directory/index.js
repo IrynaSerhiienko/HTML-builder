@@ -6,10 +6,18 @@ async function copyDir() {
     const sourceDir = path.join(__dirname, 'files');
     const targetDir = path.join(__dirname, 'files-copy');
 
-    await fs.mkdir(targetDir, { recursive: true });
-    console.log('Directory "files-copy" created successfully!\n');
+    const targetDirExists = await directoryExists(targetDir);
+
+    if (!targetDirExists) {
+      await fs.mkdir(targetDir, { recursive: true });
+      console.log('Directory "files-copy" created successfully!\n');
+    }
 
     const files = await fs.readdir(sourceDir);
+
+    await removeExtraFiles(targetDir, sourceDir, files);
+    // await removeExtraFiles(targetDir, sourceDir, files);
+
     for (const file of files) {
       const sourceFilePath = path.join(sourceDir, file);
       const targetFilePath = path.join(targetDir, file);
@@ -37,4 +45,25 @@ async function copyDir() {
     console.error('Error creating folder', error.message);
   }
 }
+
+async function removeExtraFiles(targetDir, sourceDir, filesInSourceDir) {
+  const fileInCopyFolder = await fs.readdir(targetDir);
+  for (const file of fileInCopyFolder) {
+    if (!filesInSourceDir.includes(file)) {
+      const filePathToRemove = path.join(targetDir, file);
+      await fs.unlink(filePathToRemove);
+      console.log(`File ${file} removed from "file-copy folder!"`);
+    }
+  }
+}
+
+async function directoryExists(dir) {
+  try {
+    await fs.access(dir);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 copyDir();
