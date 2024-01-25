@@ -16,7 +16,7 @@ async function readFolderContent() {
         const stats = await fs.stat(filePath);
 
         const fileSizeInByte = stats.size;
-        const fileSize = (fileSizeInByte / 1024).toFixed(3) + 'b';
+        const fileSize = (fileSizeInByte / 1024).toFixed(3) + 'Kb';
 
         const fileName = path.basename(file.name, path.extname(file.name));
         const fileExtension = path.extname(file.name).slice(1);
